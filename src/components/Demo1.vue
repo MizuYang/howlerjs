@@ -15,6 +15,14 @@
               @click="resetMp3">
         重置
       </button>
+      <!-- 靜音 -->
+      <button type="button"
+              class="btn btn-secondary mx-2"
+              @click="toggleMuteState"
+              style="width:92px;">
+        {{ isMute?'取消靜音':'靜音' }}
+      </button>
+
     </div>
   </main>
 </template>
@@ -28,6 +36,7 @@ console.log('Howler', Howler)
 
 const myMp3 = ref(null)
 const isPlaying = ref(false)
+const isMute = ref(false)
 
 onMounted(() => {
   howlerInit()
@@ -55,6 +64,10 @@ function togglePlayback () {
   const method = isPlaying.value ? 'pause' : 'play'
   myMp3.value[method]()
   isPlaying.value = !isPlaying.value
+}
+function toggleMuteState () {
+  isMute.value = !isMute.value
+  myMp3.value.mute(isMute.value)
 }
 function resetMp3 () {
   myMp3.value.stop()
