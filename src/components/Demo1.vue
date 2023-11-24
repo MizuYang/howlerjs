@@ -3,6 +3,29 @@
         style="width:100vw;
                height:100vh;">
     <div class="position-absolute-center">
+
+      <!-- 播放器 -->
+      <div class="mb-15">
+        <div class="position-relative">
+          <!-- 進度條 -->
+          <progress class="w-100 my-0 py-0"
+                    id="musicProgress"
+                    :value="progressBar" max="100"
+                    style="height:50px;">
+          </progress>
+          <!-- 百分比 -->
+          <span class="position-absolute top-50 start-50"
+                style="transform: translate(-50%,-60%);">
+            {{ progressBar.toFixed(2) }}%
+          </span>
+        </div>
+                  <p class="d-flex align-items-center text-light">
+                    <span class="text-20">{{ currentTime }}</span>
+                    <!-- ( {{ progressBar.toFixed(2) }}% ) -->
+                  </p>
+      </div>
+
+      <!-- 控制器 -->
       <div class="d-flex algin-items-center">
         <!-- 播放、暫停 -->
         <button type="button"
@@ -56,7 +79,7 @@
                  padding:20px;
                  background-color: #82777759;">
         <li>正在播放中 playing: {{ myMp3?.playing() }}</li>
-        <li>影片總長度 duration: {{ duration }}</li>
+        <li>音樂總長度 duration: {{ duration }} (秒)</li>
         <li>當前播放位置 seek: {{ seek>0?seek.toFixed(2):0 }}</li>
       </ul>
     </div>
@@ -78,6 +101,8 @@ const rate = ref(1)
 const duration = ref(0)
 const seek = ref(0)
 const seekInterval = ref(null)
+const progressBar = ref(0)
+const currentTime = ref('00:00')
 
 onMounted(() => {
   howlerInit()
@@ -102,10 +127,12 @@ function howlerInit () {
   myMp3.value.on('play', function () {
     console.log('play! 音樂開始播放')
     isPlaying.value = true
+    duration.value = myMp3.value.duration()
 
     if (seekInterval.value) return
     seekInterval.value = setInterval(() => {
       seek.value = myMp3.value.seek()
+      updateCurrentTime()
     }, 1000)
   })
   myMp3.value.on('end', function (id) {
@@ -115,7 +142,7 @@ function howlerInit () {
   })
   myMp3.value.on('load', function () {
     console.log('load 音樂已載入')
-    duration.value = myMp3.value.duration()
+    // duration.value = myMp3.value.duration()
   })
   myMp3.value.on('loaderror', function (id, error) {
     console.error('Error loading sound:', error)
@@ -171,6 +198,19 @@ function setRate (e) {
 function resetMp3 () {
   myMp3.value.stop()
   isPlaying.value = false
+}
+function updateCurrentTime (e) {
+  // progress
+  const progress = myMp3.value.seek() / myMp3.value.duration()
+  progressBar.value = progress * 100
+
+  // 當前播放的時間  例 00:37
+  const curTime = parseInt(myMp3.value.seek())
+  const minutes = Math.floor(curTime / 60)
+  const seconds = Math.floor(curTime % 60)
+  const m = `${minutes < 10 ? '0' + minutes : minutes}`
+  const s = `${seconds < 10 ? '0' + seconds : seconds}`
+  currentTime.value = `${m}:${s}`
 }
 
 </script>
