@@ -2,6 +2,14 @@
   <main class="bg-gainsboro"
         style="width:100vw;
                height:100vh;">
+    <div class="position-absolute-center">
+      <!-- 播放、暫停 -->
+      <button type="button"
+              class="btn btn-primary"
+              @click="togglePlayback">
+        {{ isPlaying?'暫停':'播放' }}
+      </button>
+    </div>
   </main>
 </template>
 
@@ -13,6 +21,7 @@ console.log('Howl', Howl)
 console.log('Howler', Howler)
 
 const myMp3 = ref(null)
+const isPlaying = ref(false)
 
 onMounted(() => {
   howlerInit()
@@ -35,6 +44,11 @@ function howlerInit () {
       console.log('Finished!')
     }
   })
+}
+function togglePlayback () {
+  const method = isPlaying.value ? 'pause' : 'play'
+  myMp3.value[method]()
+  isPlaying.value = !isPlaying.value
 }
 
 </script>
