@@ -113,6 +113,45 @@ function howlerInit () {
     isPlaying.value = false
     seekInterval.value = null
   })
+  myMp3.value.on('load', function () {
+    console.log('load 音樂已載入')
+    duration.value = myMp3.value.duration()
+  })
+  myMp3.value.on('loaderror', function (id, error) {
+    console.error('Error loading sound:', error)
+    console.log('loaderror 載入音樂時發生錯誤')
+  })
+  myMp3.value.on('playerror', function (id, error) {
+    console.error('Error playing sound:', error)
+    console.log('playerror 播放音樂時發生錯誤')
+  })
+  myMp3.value.on('play', function (id) {
+    console.log('play 音樂開始播放，ID:', id)
+  })
+  myMp3.value.on('pause', function (id) {
+    console.log('pause 音樂暫停，ID:', id)
+  })
+  myMp3.value.on('stop', function (id) {
+    console.log('stop 音樂停止，ID:', id)
+  })
+  myMp3.value.on('volume', function (id) {
+    console.log('volume 音量變更，ID:', id)
+  })
+  myMp3.value.on('rate', function (id) {
+    console.log('rate 播放速率變更，ID:', id)
+  })
+  myMp3.value.on('seek', function (id) {
+    console.log('seek 播放位置變更，ID:', id)
+  })
+  myMp3.value.on('fade', function (id) {
+    console.log('fade 淡入淡出完成，ID:', id)
+  })
+  myMp3.value.on('mute', function (id) {
+    console.log('mute 靜音事件，ID:', id)
+  })
+  myMp3.value.on('unlock', function () {
+    console.log('unlock 音訊已解鎖')
+  })
 }
 function togglePlayback () {
   const method = isPlaying.value ? 'pause' : 'play'
