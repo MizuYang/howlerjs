@@ -50,6 +50,15 @@
           {{ isMute?'取消靜音':'靜音' }}
         </button>
       </div>
+
+      <ul class="text-light"
+          style="margin-top:50px;
+                 padding:20px;
+                 background-color: #82777759;">
+        <li>正在播放中 playing: {{ myMp3?.playing() }}</li>
+        <li>影片總長度 duration: {{ duration }}</li>
+        <li>當前播放位置 seek: {{ seek>0?seek.toFixed(2):0 }}</li>
+      </ul>
     </div>
   </main>
 </template>
@@ -66,6 +75,9 @@ const isPlaying = ref(false)
 const isMute = ref(false)
 const volume = ref(100)
 const rate = ref(1)
+const duration = ref(0)
+const seek = ref(0)
+const seekInterval = ref(null)
 
 onMounted(() => {
   howlerInit()
@@ -74,7 +86,7 @@ onMounted(() => {
 function howlerInit () {
   myMp3.value = new Howl({
     // src: ['sound.webm', 'sound.mp3', 'sound.wav'],
-    src: ['src/assets/files/mp3.mp3'],
+    src: ['src/assets/files/mp3.mp3']
     // autoplay: true,
     // loop: true,
     // volume: 0.5,
@@ -84,9 +96,22 @@ function howlerInit () {
     //   laser: [4000, 1000],
     //   winner: [6000, 5000]
     // }
-    onend: function () {
-      console.log('Finished!')
-    }
+  })
+
+  // 事件註冊
+  myMp3.value.on('play', function () {
+    console.log('play! 音樂開始播放')
+    isPlaying.value = true
+
+    if (seekInterval.value) return
+    seekInterval.value = setInterval(() => {
+      seek.value = myMp3.value.seek()
+    }, 1000)
+  })
+  myMp3.value.on('end', function (id) {
+    console.log('end 音樂播放結束')
+    isPlaying.value = false
+    seekInterval.value = null
   })
 }
 function togglePlayback () {
