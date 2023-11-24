@@ -6,6 +6,20 @@
 
       <!-- 播放器 -->
       <div class="mb-15">
+        <!-- 使用 Bootstrap 進度條 -->
+        <div class="progress mb-10"
+             style="height:30px;">
+          <div class="progress-bar progress-bar-striped progress-bar-animated"
+               role="progressbar"
+               :aria-valuenow="progressBar"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               :style="`width: ${progressBar}%`">
+            {{ progressBar.toFixed(2) }}%
+          </div>
+        </div>
+
+        <!-- 自己刻進度條 -->
         <div class="position-relative">
           <!-- 進度條 -->
           <progress class="w-100 my-0 py-0"
@@ -19,10 +33,11 @@
             {{ progressBar.toFixed(2) }}%
           </span>
         </div>
-                  <p class="d-flex align-items-center text-light">
-                    <span class="text-20">{{ currentTime }}</span>
-                    <!-- ( {{ progressBar.toFixed(2) }}% ) -->
-                  </p>
+
+        <!-- 當前播放進度時間 (例 => 00:37) -->
+        <p class="d-flex align-items-center text-light">
+          <span class="text-20">{{ currentTime }}</span>
+        </p>
       </div>
 
       <!-- 控制器 -->
