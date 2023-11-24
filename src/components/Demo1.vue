@@ -29,6 +29,19 @@
                  @input="setVolume"
                  style="width:100px;">
         </div>
+        <!-- 速率 -->
+        <div class="d-flex flex-column algin-items-center ms-8 me-5">
+          <label for="customRange3"
+                 class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
+            <span>速率: </span>
+            <span class="me-3">{{ rate }}</span>
+          </label>
+          <input type="range" class="form-range"
+                 min="1" max="5" step="1"
+                 v-model="rate"
+                 @input="setRate"
+                 style="width:100px;">
+        </div>
         <!-- 靜音 -->
         <button type="button"
                 class="btn btn-secondary rounded-pill mx-5"
@@ -52,6 +65,7 @@ const myMp3 = ref(null)
 const isPlaying = ref(false)
 const isMute = ref(false)
 const volume = ref(100)
+const rate = ref(1)
 
 onMounted(() => {
   howlerInit()
@@ -86,6 +100,9 @@ function toggleMuteState () {
 }
 function setVolume (e) {
   myMp3.value.volume(e.target.value / 100)
+}
+function setRate (e) {
+  myMp3.value.rate(e.target.value)
 }
 function resetMp3 () {
   myMp3.value.stop()
