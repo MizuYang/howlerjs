@@ -9,6 +9,12 @@
               @click="togglePlayback">
         {{ isPlaying?'暫停':'播放' }}
       </button>
+      <!-- 重置 -->
+      <button type="button"
+              class="btn btn-secondary mx-2"
+              @click="resetMp3">
+        重置
+      </button>
     </div>
   </main>
 </template>
@@ -49,6 +55,10 @@ function togglePlayback () {
   const method = isPlaying.value ? 'pause' : 'play'
   myMp3.value[method]()
   isPlaying.value = !isPlaying.value
+}
+function resetMp3 () {
+  myMp3.value.stop()
+  isPlaying.value = false
 }
 
 </script>
