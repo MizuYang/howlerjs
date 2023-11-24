@@ -1,19 +1,29 @@
 <template>
-  <p class="text-primary-color position-absolute-center">
-    {{ userInfo.email }} <br />
-    {{ userInfo.phone }}
-  </p>
+  <template v-for="item in data" :key="item.id">
+    <component :is="item.component"></component>
+  </template>
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia'
-import { useUserInfoStore } from '@/stores/userStore.js'
+import { reactive, defineAsyncComponent, onMounted } from 'vue'
 
-// store
-const { getUserInfo } = useUserInfoStore()
-const { userInfo } = storeToRefs(useUserInfoStore())
+const data = reactive([
+  {
+    id: 1,
+    name: 'Demo1',
+    component: ''
+  }
+])
 
-getUserInfo()
+onMounted(() => {
+  getComponents()
+})
+
+function getComponents () {
+  data.forEach(item => {
+    item.component = defineAsyncComponent(() => import(`@/components/${item.name}.vue`))
+  })
+}
 </script>
 
 <style lang='scss' scope></style>
