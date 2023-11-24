@@ -1,28 +1,42 @@
 <template>
-  <main class="bg-gainsboro"
+  <main class="bg-dark"
         style="width:100vw;
                height:100vh;">
     <div class="position-absolute-center">
-      <!-- 播放、暫停 -->
-      <button type="button"
-              class="btn btn-primary"
-              @click="togglePlayback">
-        {{ isPlaying?'暫停':'播放' }}
-      </button>
-      <!-- 重置 -->
-      <button type="button"
-              class="btn btn-secondary mx-2"
-              @click="resetMp3">
-        重置
-      </button>
-      <!-- 靜音 -->
-      <button type="button"
-              class="btn btn-secondary mx-2"
-              @click="toggleMuteState"
-              style="width:92px;">
-        {{ isMute?'取消靜音':'靜音' }}
-      </button>
-
+      <div class="d-flex algin-items-center">
+        <!-- 播放、暫停 -->
+        <button type="button"
+                class="btn btn-primary rounded-pill"
+                @click="togglePlayback">
+          {{ isPlaying?'暫停':'播放' }}
+        </button>
+        <!-- 重置 -->
+        <button type="button"
+                class="btn btn-secondary rounded-pill mx-5"
+                @click="resetMp3">
+          重置
+        </button>
+        <!-- 音量 -->
+        <div class="d-flex flex-column algin-items-center">
+          <label for="customRange3"
+                 class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
+            <span>音量: </span>
+            <span class="me-3">{{ volume }}</span>
+          </label>
+          <input type="range" class="form-range"
+                 min="0" max="100" step="1"
+                 v-model="volume"
+                 @input="setVolume"
+                 style="width:100px;">
+        </div>
+        <!-- 靜音 -->
+        <button type="button"
+                class="btn btn-secondary rounded-pill mx-5"
+                @click="toggleMuteState"
+                style="width:92px;">
+          {{ isMute?'取消靜音':'靜音' }}
+        </button>
+      </div>
     </div>
   </main>
 </template>
@@ -37,6 +51,7 @@ console.log('Howler', Howler)
 const myMp3 = ref(null)
 const isPlaying = ref(false)
 const isMute = ref(false)
+const volume = ref(100)
 
 onMounted(() => {
   howlerInit()
@@ -69,6 +84,9 @@ function toggleMuteState () {
   isMute.value = !isMute.value
   myMp3.value.mute(isMute.value)
 }
+function setVolume (e) {
+  myMp3.value.volume(e.target.value / 100)
+}
 function resetMp3 () {
   myMp3.value.stop()
   isPlaying.value = false
@@ -76,4 +94,5 @@ function resetMp3 () {
 
 </script>
 
-<style lang='scss' scope></style>
+<style lang='scss' scope>
+</style>
