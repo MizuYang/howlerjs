@@ -123,12 +123,15 @@ const currentTime = ref('00:00')
 
 onMounted(() => {
   howlerInit()
+  console.log(import.meta.env.MODE === 'development')
 })
 
 function howlerInit () {
   myMp3.value = new Howl({
     // src: ['sound.webm', 'sound.mp3', 'sound.wav'],
-    src: ['src/assets/files/mp3.mp3']
+    src: [import.meta.env.VITE_APP_MP3_URL]
+    // src: ['assets/mp3.mp3'] //! GitHub Pages 開這個
+    // src: ['src/assets/files/mp3.mp3'] //! 本地端開這個
     // autoplay: true,
     // loop: true,
     // volume: 0.5,
