@@ -8,30 +8,31 @@
       <div class="mb-15">
         <!-- 使用 Bootstrap 進度條 -->
         <div class="progress mb-10"
+             @mousedown="clickChangeMusicPsotion"
+             @mousemove="moveChangeMusicPsotion"
              style="height:30px;">
           <div class="progress-bar progress-bar-striped progress-bar-animated"
                role="progressbar"
-               :aria-valuenow="progressBar"
+               :aria-valuenow="progressBarValue"
                aria-valuemin="0"
                aria-valuemax="100"
-               :style="`width: ${progressBar}%`">
-            {{ progressBar.toFixed(2) }}%
+               :style="`width: ${progressBarValue}%`">
+            {{ progressBarValue.toFixed(2) }}%
           </div>
         </div>
 
         <!-- 自己刻進度條 -->
         <div class="position-relative">
-          <!-- 進度條 -->
-          <progress class="w-100 my-0 py-0"
+          <!-- 進度條 (百分比使用偽元素) -->
+          <progress class="w-100 percentage"
                     id="musicProgress"
-                    :value="progressBar" max="100"
+                    ref="progressRef"
+                    :data-progress="`${progressBarValue.toFixed(2)}%`"
+                    :value="progressBarValue" max="100"
+                    @mousedown="clickChangeMusicPsotion"
+                    @mousemove="moveChangeMusicPsotion"
                     style="height:50px;">
           </progress>
-          <!-- 百分比 -->
-          <span class="position-absolute top-50 start-50"
-                style="transform: translate(-50%,-60%);">
-            {{ progressBar.toFixed(2) }}%
-          </span>
         </div>
 
         <!-- 當前播放進度時間 (例 => 00:37) -->
@@ -116,7 +117,8 @@ const rate = ref(1)
 const duration = ref(0)
 const seek = ref(0)
 const seekInterval = ref(null)
-const progressBar = ref(0)
+const progressBarValue = ref(0)
+const progressRef = ref(null)
 const currentTime = ref('00:00')
 
 onMounted(() => {
@@ -217,7 +219,7 @@ function resetMp3 () {
 function updateCurrentTime (e) {
   // progress
   const progress = myMp3.value.seek() / myMp3.value.duration()
-  progressBar.value = progress * 100
+  progressBarValue.value = progress * 100
 
   // 當前播放的時間  例 00:37
   const curTime = parseInt(myMp3.value.seek())
@@ -227,8 +229,48 @@ function updateCurrentTime (e) {
   const s = `${seconds < 10 ? '0' + seconds : seconds}`
   currentTime.value = `${m}:${s}`
 }
+function clickChangeMusicPsotion (e) {
+  // 計算滑鼠點擊位置相對於進度條左側的偏移量
+  const clickPosition = e.clientX - progressRef.value.getBoundingClientRect().left
+  const progressBarWidth = progressRef.value.offsetWidth
+  // 進度條的百分比 = 當前點擊的位置 除以 進度條的寬度
+  const clickPercentage = clickPosition / progressBarWidth
+  // 改變百分比的值  例: 15%
+  progressBarValue.value = clickPercentage * 100
+  // 改變播放位置
+  myMp3.value.seek(myMp3.value.duration() * clickPercentage)
+  updateCurrentTime()
+}
+function moveChangeMusicPsotion (e) {
+  // 判斷是否正在拖曳（按住左鍵的狀態下移動）
+  if (e.buttons === 1) {
+  // 計算滑鼠點擊位置相對於進度條左側的偏移量
+    const dragPosition = e.clientX - progressRef.value.getBoundingClientRect().left
+    const progressBarWidth = progressRef.value.offsetWidth
+    // 進度條的百分比 = 當前點擊的位置 除以 進度條的寬度
+    const dragPercentage = dragPosition / progressBarWidth
+    // 改變百分比的值  例: 15%
+    progressBarValue.value = dragPercentage * 100
+
+    myMp3.value.seek(myMp3.value.duration() * dragPercentage)
+    updateCurrentTime()
+  }
+}
 
 </script>
 
 <style lang='scss' scope>
+.percentage {
+  &::before {
+    content: attr(data-progress);
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-60%);
+    font-size: 20px;
+    color: #000000;
+    font-weight: 900;
+  }
+}
 </style>
