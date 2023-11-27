@@ -4,100 +4,102 @@
                height:100vh;">
     <div class="position-absolute-center">
 
-      <!-- 播放器 -->
-      <div class="mb-15">
-        <!-- 使用 Bootstrap 進度條 -->
-        <div class="progress mb-10"
-             @mousedown="clickChangeMusicPsotion"
-             @mousemove="moveChangeMusicPsotion"
-             style="height:30px;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated"
-               role="progressbar"
-               :aria-valuenow="progressBarValue"
-               aria-valuemin="0"
-               aria-valuemax="100"
-               :style="`width: ${progressBarValue}%`">
-            {{ progressBarValue.toFixed(2) }}%
+      <template v-if="isLoaded">
+        <!-- 播放器 -->
+        <div class="mb-15">
+          <!-- 使用 Bootstrap 進度條 -->
+          <div class="progress mb-10"
+               @mousedown="clickChangeMusicPsotion"
+               @mousemove="moveChangeMusicPsotion"
+               style="height:30px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 :aria-valuenow="progressBarValue"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 :style="`width: ${progressBarValue}%`">
+              {{ progressBarValue.toFixed(2) }}%
+            </div>
           </div>
+          <!-- 自己刻進度條 -->
+          <div class="position-relative">
+            <!-- 進度條 (百分比使用偽元素) -->
+            <progress class="w-100 percentage"
+                      id="musicProgress"
+                      ref="progressRef"
+                      :data-progress="`${progressBarValue.toFixed(2)}%`"
+                      :value="progressBarValue" max="100"
+                      @mousedown="clickChangeMusicPsotion"
+                      @mousemove="moveChangeMusicPsotion"
+                      style="height:50px;">
+            </progress>
+          </div>
+          <!-- 當前播放進度時間 (例 => 00:37) -->
+          <p class="d-flex align-items-center text-light">
+            <span class="text-20">{{ currentTime }}</span>
+          </p>
         </div>
-
-        <!-- 自己刻進度條 -->
-        <div class="position-relative">
-          <!-- 進度條 (百分比使用偽元素) -->
-          <progress class="w-100 percentage"
-                    id="musicProgress"
-                    ref="progressRef"
-                    :data-progress="`${progressBarValue.toFixed(2)}%`"
-                    :value="progressBarValue" max="100"
-                    @mousedown="clickChangeMusicPsotion"
-                    @mousemove="moveChangeMusicPsotion"
-                    style="height:50px;">
-          </progress>
+        <!-- 控制器 -->
+        <div class="d-flex algin-items-center">
+          <!-- 播放、暫停 -->
+          <button type="button"
+                  class="btn btn-primary rounded-pill"
+                  @click="togglePlayback">
+            {{ isPlaying?'暫停':'播放' }}
+          </button>
+          <!-- 重置 -->
+          <button type="button"
+                  class="btn btn-secondary rounded-pill mx-5"
+                  @click="resetMp3">
+            重置
+          </button>
+          <!-- 音量 -->
+          <div class="d-flex flex-column algin-items-center">
+            <label for="customRange3"
+                   class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
+              <span>音量: </span>
+              <span class="me-3">{{ volume }}</span>
+            </label>
+            <input type="range" class="form-range"
+                   min="0" max="100" step="1"
+                   v-model="volume"
+                   @input="setVolume"
+                   style="width:100px;">
+          </div>
+          <!-- 速率 -->
+          <div class="d-flex flex-column algin-items-center ms-8 me-5">
+            <label for="customRange3"
+                   class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
+              <span>速率: </span>
+              <span class="me-3">{{ rate }}</span>
+            </label>
+            <input type="range" class="form-range"
+                   min="1" max="5" step="1"
+                   v-model="rate"
+                   @input="setRate"
+                   style="width:100px;">
+          </div>
+          <!-- 靜音 -->
+          <button type="button"
+                  class="btn btn-secondary rounded-pill mx-5"
+                  @click="toggleMuteState"
+                  style="width:92px;">
+            {{ isMute?'取消靜音':'靜音' }}
+          </button>
         </div>
+        <ul class="text-light"
+            style="margin-top:50px;
+                   padding:20px;
+                   background-color: #82777759;">
+          <li>正在播放中 playing: {{ myMp3?.playing() }}</li>
+          <li>音樂總長度 duration: {{ duration }} (秒)</li>
+          <li>當前播放位置 seek: {{ seek>0?seek.toFixed(2):0 }}</li>
+        </ul>
+      </template>
 
-        <!-- 當前播放進度時間 (例 => 00:37) -->
-        <p class="d-flex align-items-center text-light">
-          <span class="text-20">{{ currentTime }}</span>
-        </p>
-      </div>
-
-      <!-- 控制器 -->
-      <div class="d-flex algin-items-center">
-        <!-- 播放、暫停 -->
-        <button type="button"
-                class="btn btn-primary rounded-pill"
-                @click="togglePlayback">
-          {{ isPlaying?'暫停':'播放' }}
-        </button>
-        <!-- 重置 -->
-        <button type="button"
-                class="btn btn-secondary rounded-pill mx-5"
-                @click="resetMp3">
-          重置
-        </button>
-        <!-- 音量 -->
-        <div class="d-flex flex-column algin-items-center">
-          <label for="customRange3"
-                 class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
-            <span>音量: </span>
-            <span class="me-3">{{ volume }}</span>
-          </label>
-          <input type="range" class="form-range"
-                 min="0" max="100" step="1"
-                 v-model="volume"
-                 @input="setVolume"
-                 style="width:100px;">
-        </div>
-        <!-- 速率 -->
-        <div class="d-flex flex-column algin-items-center ms-8 me-5">
-          <label for="customRange3"
-                 class="d-flex justify-content-between form-label text-light text-18 text-center mb-0">
-            <span>速率: </span>
-            <span class="me-3">{{ rate }}</span>
-          </label>
-          <input type="range" class="form-range"
-                 min="1" max="5" step="1"
-                 v-model="rate"
-                 @input="setRate"
-                 style="width:100px;">
-        </div>
-        <!-- 靜音 -->
-        <button type="button"
-                class="btn btn-secondary rounded-pill mx-5"
-                @click="toggleMuteState"
-                style="width:92px;">
-          {{ isMute?'取消靜音':'靜音' }}
-        </button>
-      </div>
-
-      <ul class="text-light"
-          style="margin-top:50px;
-                 padding:20px;
-                 background-color: #82777759;">
-        <li>正在播放中 playing: {{ myMp3?.playing() }}</li>
-        <li>音樂總長度 duration: {{ duration }} (秒)</li>
-        <li>當前播放位置 seek: {{ seek>0?seek.toFixed(2):0 }}</li>
-      </ul>
+      <template v-else>
+        <span class="text-light">音樂載入中...</span>
+      </template>
     </div>
   </main>
 </template>
@@ -110,6 +112,7 @@ console.log('Howl', Howl)
 console.log('Howler', Howler)
 
 const myMp3 = ref(null)
+const isLoaded = ref(false)
 const isPlaying = ref(false)
 const isMute = ref(false)
 const volume = ref(100)
@@ -161,6 +164,7 @@ function howlerInit () {
   })
   myMp3.value.on('load', function () {
     console.log('load 音樂已載入')
+    isLoaded.value = true
     // duration.value = myMp3.value.duration()
   })
   myMp3.value.on('loaderror', function (id, error) {
