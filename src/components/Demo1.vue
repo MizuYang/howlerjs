@@ -123,7 +123,6 @@ const currentTime = ref('00:00')
 
 onMounted(() => {
   howlerInit()
-  console.log(import.meta.env.MODE === 'development')
 })
 
 function howlerInit () {
