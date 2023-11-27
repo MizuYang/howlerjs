@@ -1,0 +1,1 @@
+.percentage:before{content:attr(data-progress);display:block;position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:20px;color:#000;font-weight:900}
